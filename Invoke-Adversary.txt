@@ -1,6 +1,6 @@
 ﻿<#
 This sample script is not supported under any standard support program or service. .....
-This sample sample script is provided AS IS without warranty of any kind. 
+This sample sample scriptertrtet is provided AS IS without warranty of any kind. 
 The author further discccccclaims all implied warranties including, without limitation, any implied warranties of merchantability 
 or of fitness for a particular purpose. 
 The entire risk arising out of the use or performance of the sample scripts and documentation remains with you. 
