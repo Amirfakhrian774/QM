@@ -1,0 +1,69 @@
+version: '3.4'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+      - 9093:9093
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      ZOOKEEPER_SASL_ENABLED: 'true' 
+      KAFKA_SASL_MECHANISM: scram-sha-256 
+      KAFKA_INTER_BROKER_PROTOCOL_VERSION: '3.4' 
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092, SASL_SSL://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, SASL_SSL:SSL
+      KAFKA_SSL_KEYSTORE_FILENAME: kafka.keystore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: ssl.creds
+      KAFKA_SSL_KEY_CREDENTIALS: ssl.creds
+      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: ssl.creds
+      KAFKA_SASL_JAAS_CONFIG: |
+            org.apache.kafka.common.security.scram.ScramLoginModule required
+            mechanism=SCRAM-SHA-256
+            user.username="admin"
+            user.password="your_admin_password";
+
+      KAFKA_ACLS_ENABLED: "true" 
+      KAFKA_OPTS: "-Xms1g -Xmx2g"
+    volumes:
+      - ./certs:/etc/kafka/secrets
+
+# Explanation of Changes:
+# 1. **`ZOOKEEPER_SASL_ENABLED: 'true'`:** Enables SASL authentication for ZooKeeper.
+# 2. **`KAFKA_SASL_MECHANISM: scram-sha-256`:** Specifies the SASL mechanism to use (SCRAM-SHA-256 is recommended).
+# 3. **`KAFKA_INTER_BROKER_PROTOCOL_VERSION: '3.4'`:** Sets the inter-broker protocol version to support SASL.
+# 4. **`KAFKA_ADVERTISED_LISTENERS`:** Updated to include `SASL_SSL://localhost:9093`.
+# 5. **`KAFKA_LISTENER_SECURITY_PROTOCOL_MAP`:** Updated to include `SASL_SSL:SSL`.
+# 6. **SSL Configuration:** 
+#    - Replaced placeholders like `ssl.creds` with actual file paths or environment variables.
+#    - Added `KAFKA_SSL_KEYSTORE_LOCATION`, `KAFKA_SSL_KEYSTORE_PASSWORD`, `KAFKA_SSL_KEY_PASSWORD`, and `KAFKA_SSL_TRUSTSTORE_LOCATION`.
+# 7. **`KAFKA_SASL_JAAS_CONFIG`:** Defines the JAAS configuration for SASL authentication. 
+#    - Replace `your_admin_password` with the actual admin password.
+# 8. **`KAFKA_ACLS_ENABLED: "true"`:** Enables ACLs (Access Control Lists) for enhanced security.
+
+# **Important Notes:**
+
+# * **Replace Placeholders:** Replace the placeholder values (passwords, file paths) with your actual credentials and configuration.
+# * **Create Keys and Certificates:** 
+#     - Generate the necessary keystores and truststores for both the broker and clients.
+#     - Ensure that the certificates are properly signed by a trusted CA.
+# * **ACL Configuration:** After enabling ACLs, you will need to configure ACL rules to control access to topics and resources.
+# * **Client Configuration:** 
+#     - Modify your Kafka client applications to include SASL authentication settings. 
+#     - Refer to the Kafka documentation for specific client libraries and their SASL configuration options.
+
+# This configuration provides a basic setup for SASL authentication in your Kafka cluster. You can further customize it based on your specific security requirements and use cases.
+
+# Remember to refer to the official Confluent documentation for the most up-to-date and comprehensive information on configuring SASL in a Confluent platform.
