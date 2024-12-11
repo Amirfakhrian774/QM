@@ -33,12 +33,13 @@ services:
             org.apache.kafka.common.security.scram.ScramLoginModule required
             mechanism=SCRAM-SHA-256
             user.username="admin"
-            user.password="your_admin_password";
+            user.password="kafkapass";
 
       KAFKA_ACLS_ENABLED: "true" 
       KAFKA_OPTS: "-Xms1g -Xmx2g"
     volumes:
       - ./certs:/etc/kafka/secrets
+
 
 # Explanation of Changes:
 # 1. **`ZOOKEEPER_SASL_ENABLED: 'true'`:** Enables SASL authentication for ZooKeeper.
